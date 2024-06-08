@@ -15,6 +15,23 @@ class UserRegView(generics.CreateAPIView):
     serializer_class = UserRegSerializer  # Use your custom serializer
     permission_classes = [AllowAny]  # Allow unauthenticated users to register
 
+    def create(self, request, *args, **kwargs):
+        phone = request.data.get('phone')
+        if not phone:
+            return Response({"error": "Phone number is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create a User instance with a unique username (could be the phone number or any unique identifier)
+        user = User.objects.create(username=phone)
+        user.set_unusable_password()
+        user.save()
+
+        # Create a Userprofile instance associated with the user
+        userprofile = Userprofile(user=user, phone=phone)
+        userprofile.save()
+
+        return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
+    
+
 class UserUpdateLogsView(generics.UpdateAPIView):
     queryset = Userprofile.objects.all()
     serializer_class = UserUpdateLogsSerializer
