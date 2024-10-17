@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views, UserRegView, user_views, flags_views, event_views, chat_views, steeze_views
+from . import thoughts, views, UserRegView, user_views, flags_views, event_views, chat_views, steeze_views
 
 urlpatterns = [
     path('', views.homepage, name='home'),
@@ -44,4 +44,11 @@ urlpatterns = [
     path('userprofiles/', user_views.UserProfileListCreateView.as_view(), name='userprofile-list-create'),
     path('userprofile/<int:pk>/', user_views.UserProfileRetrieveUpdateDestroyView.as_view(), name='userprofile-detail'),
     path('login/', user_views.UserLoginView.as_view(), name='user-login'),
+
+
+    # urls for Thoughts
+    path('thoughts/<int:post_id>/like/', thoughts_view.LikePostView.as_view(), name='like-post'),
+    path('thoughts/<int:post_id>/comment/', thoughts_view.CommentPostView.as_view(), name='comment-post'),
+    path('thoughts/<int:post_id>/share/', thoughts_view.SharePostView.as_view(), name='share-post'),
+    path('thoughts/<int:post_id>/repost/', thoughts_view.RepostView.as_view(), name='repost-post'),
 ]

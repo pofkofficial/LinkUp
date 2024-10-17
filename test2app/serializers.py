@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import FlagRequest, Userprofile, Chat, Message, VerificationStatus, VerificationRq,  SteezeLikes, SteezeCom, Steeze, RelationRq,  OrganizersRq, OrgStatus, Flags, Event
-
+from .models import *
 class UserRegSerializer(serializers.ModelSerializer):
     class Meta:
         model = Userprofile
@@ -97,3 +96,44 @@ class VerificationStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = VerificationStatus
         fields = '__all__'
+
+
+# Serializers for Thoughts
+
+class ThCommentSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = ThComment
+        fields = ['id', 'user', 'text', 'created_at']
+
+class ThoughtsSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)
+    likes_count = serializers.IntegerField(source='likes.count', read_only=True)
+    comments = ThCommentSerializer(many=True, read_only=True)
+    shares_count = serializers.IntegerField(source='shares.count', read_only=True)
+    reposts_count = serializers.IntegerField(source='reposts.count', read_only=True)
+
+    class Meta:
+        model = Thoughts
+        fields = ['id', 'user', 'content', 'video_url', 'created_at', 'likes_count', 'comments', 'shares_count', 'reposts_count']
+
+class ThLikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ThLike
+        fields = ['id', 'user', 'post', 'created_at']
+
+class ThCommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ThComment
+        fields = ['id', 'text']
+
+class ShareSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ThShare
+        fields = ['id', 'user', 'post', 'created_at']
+
+class RepostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ThRepost
+        fields = ['id', 'user', 'original_post', 'reposted_at']

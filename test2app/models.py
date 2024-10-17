@@ -146,3 +146,46 @@ class VerificationStatus(models.Model):
     vrequest = models.ForeignKey(VerificationRq, models.DO_NOTHING, blank=True, null=True)
     status = models.CharField(max_length=45, blank=True, null=True)
 
+# Models for Posts/Feeds
+
+class Thoughts(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    video_url = models.URLField(blank=True, null=True)  # Optional field for video posts
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Post by {self.user.username}"
+
+class ThLike(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    thought = models.ForeignKey(Thoughts, on_delete=models.CASCADE, related_name='likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} liked post {self.post.id}"
+
+class ThComment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    thought = models.ForeignKey(Thoughts, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comment by {self.user.username} on post {self.post.id}"
+
+class ThShare(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    thought = models.ForeignKey(Thoughts, on_delete=models.CASCADE, related_name='shares')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} shared post {self.post.id}"
+
+class ThRepost(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    original_thought = models.ForeignKey(Thoughts, on_delete=models.CASCADE, related_name='reposts')
+    reposted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} reposted post {self.original_post.id}"

@@ -1,0 +1,44 @@
+from rest_framework import viewsets, generics
+from rest_framework.permissions import IsAuthenticated
+from .models import Post
+from .serializers import ThoughtsSerializer,ThLikeSerializer, ThCommentCreateSerializer, ThShareSerializer, ThRepostSerializer
+
+class ThoughtsViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all().order_by('-created_at')
+    serializer_class = ThoughtsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class LikePostView(generics.CreateAPIView):
+    serializer_class = ThLikeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        post = Post.objects.get(id=self.kwargs['post_id'])
+        serializer.save(user=self.request.user, post=post)
+
+class CommentPostView(generics.CreateAPIView):
+    serializer_class = ThCommentCreateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        post = Post.objects.get(id=self.kwargs['post_id'])
+        serializer.save(user=self.request.user, post=post)
+
+class SharePostView(generics.CreateAPIView):
+    serializer_class = ThShareSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        post = Post.objects.get(id=self.kwargs['post_id'])
+        serializer.save(user=self.request.user, post=post)
+
+class RepostView(generics.CreateAPIView):
+    serializer_class = ThRepostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        original_post = Post.objects.get(id=self.kwargs['post_id'])
+        serializer.save(user=self.request.user, original_post=original_post)
